@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>IMDB BOT 😎</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" href="/static/styles.css">
+</head>
+<body>
+    <h1 class="text-center main-header">IMDB Bot</h1>
+
+    <div class="container">
+        
+        <div class="row">
+            
+            <div class="col-md-8 col-md-offset-2 hangout-container">
+                <div id="hangout-header">
+                    <span class="fa fa-user"></span>
+                    <div class="action-btns">
+                        <span class="fa fa-minus" id="minimize-btn"></span>
+                        <span class="fa fa-times" id="close-btn"></span>
+                    </div>
+                </div><!-- /.hangout-header -->
+
+                <div id="hangout-messages">
+                </div><!-- /.hangout-messages -->
+
+                <form method="POST" id="hangout-footer">
+                    <input type="text" name="user_input" id="user-input" placeholder="Send a message" autocomplete="off">
+                </form><!-- /.hangout-footer -->
+            </div><!-- /.col-md-8 -->
+
+        </div><!-- /.row -->
+
+    </div><!-- /.container -->
+
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="   sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        var WELCOME_MSG = "{{ data.welcome_msg }}";
+        var $userInput = $("#user-input"),
+            $hangoutHeader = $("#hangout-header"),
+            $hangoutMessages = $("#hangout-messages"),
+            $hangoutFooter = $("#hangout-footer"),
+            $minimizeBtn = $("#minimize-btn"),
+            $closeBtn = $("#close-btn");
+
+        function init() {
+            var html = constructBotMessage(WELCOME_MSG);
+            // delay bot message by 1 sec
+            setTimeout(function() {
+                $hangoutMessages.append(html);
+            }, 1000);
+        }
+
+        $closeBtn.on("click", function(e) {
+            e.preventDefault();
+            window.location = "/";
+        });
+
+        // iterator to toggle click for minimize button
+        var iterator = 0;
+        $minimizeBtn.on("click", function(e) {
+            e.preventDefault();
+            iterator += 1;
+
+            if (iterator % 2 == 0) {
+                $hangoutHeader.animate(
+                                {
+                                    marginTop: '0px'
+                                }, 200);
+                $hangoutMessages.show();
+                $hangoutFooter.show();
+            } else {
+                $hangoutHeader.animate(
+                                {
+                                    marginTop: $(document).height() - 100 + "px" // 100 => 60px for heading height and 40px for han-header height
+                                }, 200);
+                $hangoutMessages.hide();
+                $hangoutFooter.hide();
+            }
+            
+        });
+
+        $(document).ready(function() {
+            init();
+        });
+
+        // Returns a string as time 
+        // Ex: 10:00 am
+        function getCurrentTime() {
+            var nowDate = new Date(),
+                currentTime = '',
+                hrs = (nowDate.getHours() < 10 ? '0' : '') + nowDate.getHours(),
+                mins = (nowDate.getMinutes() < 10 ? '0': '') + nowDate.getMinutes();
+
+            currentTime = hrs <= 12 ? String(hrs + ":" + mins + " AM") : String(hrs + ":" + mins + " PM");
+
+            return currentTime;
+        }
+        function resetUserInput() {
+            $userInput.val("");
+        }
+        // Construct Bot chat bubble
+        function constructBotMessage(msg) {
+            var html = "<div class='bot-message-container'>" + 
+                            "<img src='/images/bot1.png' class='img-responsive img-circle bot-img'>" +
+                            "<div class='bot-message-row'>" +
+                                "<div class='bot-message'> " + msg + " </div>" +
+                                "<div class='time'>Bot • " + getCurrentTime() + "</div>" +
+                            "</div>" +
+                        "</div>";
+            return html;
+        }
+        // Construct User chat bubble
+        function constuctUserChatBubble(msg) {
+            var html = "<div class='user-message-container'>" + 
+                            "<div class='user-message-row'>" +
+                                "<div class='user-message'> " + msg + " </div>" +
+                                "<div class='time'><span class='user-time'>" + getCurrentTime() + "</span></div>" +
+                            "</div>" +
+                            "<img src='/images/user.png' class='img-responsive img-circle user-img'>" +
+                        "</div>";
+            return html;
+        }
+        function ajaxSendDataToBot() {
+            console.log($userInput.val());
+            $.ajax({
+                url : '/',
+                type : 'POST', 
+                dataType: 'json',
+                data : JSON.stringify($userInput.val()),
+                processData: false,
+                contentType: false,
+                success: function(data, status, xhr) {
+                    // error
+                    if (data.error === true) {
+                        var html = constructBotMessage(data.error_msg);
+                        // delay bot message by 1 sec
+                        setTimeout(function() {
+                            $hangoutMessages.append(html);
+                        }, 1000);
+                        resetUserInput();
+                    } else if (data.success === true) {
+                        // success
+                        var html = constructBotMessage(data.success_msg);
+                        // delay bot message by 1 sec
+                        setTimeout(function() {
+                            $hangoutMessages.append(html);
+                        }, 1000);
+                        resetUserInput();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(error);
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+        $userInput.on("keypress", function(e) {
+            
+            // if enter key pressed send data via ajax
+            if (e.keyCode === 13) {
+                e.preventDefault();
+
+                // first constuct user chat bubble
+                var html = constuctUserChatBubble($(this).val());
+                $hangoutMessages.append(html);
+                $hangoutMessages.animate({
+                    scrollTop: $hangoutMessages.scrollHeight
+                }, 1);
+                ajaxSendDataToBot();
+            }
+        });
+        
+    </script>
+</body>
+</html>

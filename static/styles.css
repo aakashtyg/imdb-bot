@@ -1,0 +1,125 @@
+* {
+    box-sizing: border-box;
+}
+html {
+    height: 100%;
+}
+body {
+    background: #ddd;
+}
+.hangout-container {
+    max-height: 645px;
+    position: static;
+}
+.main-header {
+    font-weight: 300;
+}
+.fa {
+    color: #fff;
+    font-size: 17px;
+}
+#minimize-btn:hover,
+#close-btn:hover {
+    cursor: pointer;
+}
+#hangout-header {
+    background: #404040;
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+}
+#minimize-btn {
+    margin-right: 17px;
+}
+#hangout-messages {
+    background: #fff;
+    padding: 10px;
+    border-right: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    background: #ECEFF1;
+    max-height: 645px;
+    overflow-y: scroll;
+}
+#user-input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border: 1px solid #ccc;
+}
+#user-input:focus {
+    outline: none;
+    border: none;
+    border: 1px solid #85B7D9;
+    background: #FFF;
+    color: rgba(0,0,0,.8);
+}
+.bot-img, 
+.user-img {
+    height: 50px;
+    width: 50px;
+    border: 1px solid #ccc;
+}
+.bot-message-container {
+    display: flex;
+    justify-content: flex-start;
+}
+.user-message-container {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 10px;
+}
+.user-message-row {
+    position: relative;
+}
+.bot-message, 
+.user-message {
+    padding: 10px;
+    background: #fff;
+    border-radius: 2px;
+    position: relative;
+    margin-left: 10px;
+}
+.bot-message:after {
+    content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: -14px;
+    right: auto;
+    top: 0px;
+    bottom: auto;
+    border: 7px solid;
+    border-color: transparent #fff transparent transparent;
+}
+.user-message {
+    background: #CFD8DC;
+    margin-left: 0;
+    margin-right: 10px;
+}
+.user-message:after {
+     content: ' ';
+    position: absolute;
+    width: 0;
+    height: 0;
+    right: -14px;
+    top: 0px;
+    bottom: auto;
+    border: 7px solid;
+    border-color: transparent transparent transparent #CFD8DC;
+}
+.user-time {
+    position: absolute;
+        right: 10px;
+}
+.time {
+    padding: 10px;
+    color: #999;
+    font-size: 12px;
+    font-weight: 200;
+    white-space: nowrap;
+}
+@media screen and (max-width: 768px) {
+    /*.main-header {
+        font-size:14px;
+    }*/
+}
