@@ -2,7 +2,8 @@ import controller
 import jinja2
 import json
 import random
-import os 
+import os
+import urllib2
 import webapp2
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -20,9 +21,11 @@ class Handler(webapp2.RequestHandler):
         self.write(self.render_str(template, **kwargs))
 
 class MainPage(Handler):
+    ''' Main page requests handler '''
 
     def get(self):
-        print "IN GET"
+        ''' GET Request for the main page '''
+
         # Initialize bot 
         bot = controller.Bot()
 
@@ -31,7 +34,8 @@ class MainPage(Handler):
         self.render("index.html", data = data)
 
     def post(self):
-        print "IN post"
+        ''' POST Request for the main page '''
+
         input_string = json.loads(self.request.body)
         # Return dict
         jsonData = {}
@@ -39,18 +43,22 @@ class MainPage(Handler):
         if '-' in input_string:
             # Get year
             yr = input_string.split('-', 1)[1].strip()
-            # Get Movie name
+            # Get Movie name, and replace spaces with '+'
             movie_name = input_string.split('-', 1)[0].strip()
+            movie_name = movie_name.replace(' ', '+')
 
-            # Get data from OMDB API
+            # Get the info of movie from the OMDB API (http://www.omdbapi.com/)
+            movie_url = 'http://www.omdbapi.com/?t=' + movie_name + '&y=' + yr + '&r=json'
+            r = urllib2.urlopen(movie_url)
+            movie_info = r.read()
 
-
+            jsonData['movie'] = movie_info
             jsonData['success'] = True
             jsonData['success_msg'] = controller.SUCCESS_MSG
             self.response.out.write(json.dumps(jsonData))
 
         elif input_string.lower() in controller.GREETINGS_LIST:
-            print "in elif"
+
             jsonData['success'] = True
             jsonData['success_msg'] = random.choice(controller.GREETINGS_RESPONSE_LIST)
             return self.response.out.write(json.dumps(jsonData))
