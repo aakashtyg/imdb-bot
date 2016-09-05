@@ -50,7 +50,7 @@ class MainPage(Handler):
             # Get the info of movie from the OMDB API (http://www.omdbapi.com/)
             movie_url = 'http://www.omdbapi.com/?t=' + movie_name + '&y=' + yr + '&r=json'
             r = urllib2.urlopen(movie_url)
-            movie_info = r.read()
+            movie_info = json.loads(r.read())
 
             jsonData['movie'] = movie_info
             jsonData['success'] = True
