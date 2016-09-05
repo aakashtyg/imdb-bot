@@ -40,18 +40,21 @@ class MainPage(Handler):
             # Get year
             yr = input_string.split('-', 1)[1].strip()
             # Get Movie name
-            movie_name = input_string.split(' ', 2)[1].strip()
+            movie_name = input_string.split('-', 1)[0].strip()
 
             # Get data from OMDB API
+
 
             jsonData['success'] = True
             jsonData['success_msg'] = controller.SUCCESS_MSG
             self.response.out.write(json.dumps(jsonData))
+
         elif input_string.lower() in controller.GREETINGS_LIST:
-            print "hwerw"
+            print "in elif"
             jsonData['success'] = True
             jsonData['success_msg'] = random.choice(controller.GREETINGS_RESPONSE_LIST)
             return self.response.out.write(json.dumps(jsonData))
+
         else:
             jsonData['error'] = True
             jsonData['error_msg'] = controller.ERROR_MSG
