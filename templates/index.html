@@ -134,6 +134,12 @@
                         "</div>";
             return html;
         }
+        // Delay bot message by sec
+        function delayBotMessage(html, sec) {
+            setTimeout(function() {
+                $hangoutMessages.append(html);
+            }, sec);
+        }
         function ajaxSendDataToBot() {
             console.log($userInput.val());
             $.ajax({
@@ -144,21 +150,30 @@
                 processData: false,
                 contentType: false,
                 success: function(data, status, xhr) {
+                    console.log(data);
                     // error
                     if (data.error === true) {
                         var html = constructBotMessage(data.error_msg);
                         // delay bot message by 1 sec
-                        setTimeout(function() {
-                            $hangoutMessages.append(html);
-                        }, 1000);
+                        delayBotMessage(html, 1000);
                         resetUserInput();
                     } else if (data.success === true) {
                         // success
                         var html = constructBotMessage(data.success_msg);
                         // delay bot message by 1 sec
-                        setTimeout(function() {
-                            $hangoutMessages.append(html);
-                        }, 1000);
+                        delayBotMessage(html, 1000)
+
+                        // Display movie info
+                        var msg = "Here's your movie info <br>";
+                        msg += "<strong>Title:</strong> " + data.movie.Title + "<br>";
+                        msg += "<strong>Actors:</strong> " + data.movie.Actors + "<br>";
+                        msg += "<strong>Genre:</strong> " + data.movie.Genre + "<br>";
+                        msg += "<strong>Runtime:</strong> " + data.movie.Runtime + "<br>";
+                        msg += "<strong>Rating:</strong> " + data.movie.imdbRating;
+                        var movie_html = constructBotMessage(msg)
+
+                        // delay bot message by 1 sec
+                        delayBotMessage(movie_html, 2000);
                         resetUserInput();
                     }
                 },
